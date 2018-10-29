@@ -1,4 +1,4 @@
-// swift-tools-version:4.0
+// swift-tools-version:4.2
 import PackageDescription
 
 let package = Package(
@@ -9,10 +9,10 @@ let package = Package(
     ],
 
     dependencies: [
-        .package(url: "https://github.com/wickwirew/Runtime.git", .branch("swift42")),
+        .package(url: "https://github.com/noahemmet/Runtime.git", .branch("swift-env")),
 
         // ⏱ Promises and reactive-streams in Swift built for high-performance and scalability.
-        .package(url: "https://github.com/vapor/core.git", from: "3.4.4"),
+        .package(url: "https://github.com/vapor/core.git", .upToNextMajor(from: "3.0.0")),
     ],
 
     targets: [
