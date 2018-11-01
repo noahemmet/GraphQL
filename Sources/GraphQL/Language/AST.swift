@@ -3,27 +3,27 @@
  * identify the region of the source from which the AST derived.
  */
 public struct Location {
-
+    
     /**
      * The character offset at which this Node begins.
      */
     public let start: Int
-
+    
     /**
      * The character offset at which this Node ends.
      */
     public let end: Int
-
+    
     /**
      * The Token at which this Node begins.
      */
     public let startToken: Token
-
+    
     /**
      * The Token at which this Node ends.
      */
     public let endToken: Token
-
+    
     /**
      * The Source document the AST represents.
      */
@@ -56,17 +56,17 @@ final public class Token {
         case float = "Float"
         case string = "String"
         case comment = "Comment"
-
+        
         public var description: String {
             return rawValue
         }
     }
-
+    
     /**
      * The kind of Token.
      */
     public let kind: Kind
-
+    
     /**
      * The character offset at which this Node begins.
      */
@@ -94,7 +94,7 @@ final public class Token {
      */
     public internal(set) weak var prev: Token?
     public internal(set) var next: Token?
-
+    
     init(kind: Kind, start: Int, end: Int, line: Int, column: Int, value: String? = nil, prev: Token? = nil, next: Token? = nil) {
         self.kind = kind
         self.start = start
@@ -121,13 +121,13 @@ extension Token : Equatable {
 extension Token : CustomStringConvertible {
     public var description: String {
         var description = "Token(kind: \(kind)"
-
+        
         if let value = value {
             description += ", value: \(value)"
         }
-
+        
         description += ", line: \(line), column: \(column))"
-
+        
         return description
     }
 }
@@ -135,14 +135,14 @@ extension Token : CustomStringConvertible {
 public enum NodeResult {
     case node(Node)
     case array([Node])
-
+    
     public var isNode: Bool {
         if case .node = self {
             return true
         }
         return false
     }
-
+    
     public var isArray: Bool {
         if case .array = self {
             return true
@@ -165,9 +165,9 @@ extension Node {
     public func get(key: String) -> NodeResult? {
         return nil
     }
-
+    
     public func set(value: Node?, key: String) {
-
+        
     }
 }
 
@@ -212,7 +212,7 @@ public final class Name {
     public let kind: Kind = .name
     public let loc: Location?
     public let value: String
-
+    
     init(loc: Location? = nil, value: String) {
         self.loc = loc
         self.value = value
@@ -229,12 +229,12 @@ public final class Document {
     public let kind: Kind = .document
     public let loc: Location?
     public let definitions: [Definition]
-
+    
     init(loc: Location? = nil, definitions: [Definition]) {
         self.loc = loc
         self.definitions = definitions
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "definitions":
@@ -253,13 +253,13 @@ extension Document : Equatable {
         guard lhs.definitions.count == rhs.definitions.count else {
             return false
         }
-
+        
         for (l, r) in zip(lhs.definitions, rhs.definitions) {
             guard l == r else {
                 return false
             }
         }
-
+        
         return true
     }
 }
@@ -285,7 +285,7 @@ public func == (lhs: Definition, rhs: Definition) -> Bool {
     default:
         return false
     }
-
+    
     return false
 }
 
@@ -304,7 +304,7 @@ public final class OperationDefinition {
     public let variableDefinitions: [VariableDefinition]
     public let directives: [Directive]
     public let selectionSet: SelectionSet
-
+    
     init(loc: Location? = nil, operation: OperationType, name: Name? = nil, variableDefinitions: [VariableDefinition] = [], directives: [Directive] = [], selectionSet: SelectionSet) {
         self.loc = loc
         self.operation = operation
@@ -313,7 +313,7 @@ public final class OperationDefinition {
         self.directives = directives
         self.selectionSet = selectionSet
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "name":
@@ -340,7 +340,7 @@ extension OperationDefinition : Hashable {
     public var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
-
+    
     public static func == (lhs: OperationDefinition, rhs: OperationDefinition) -> Bool {
         return lhs.operation == rhs.operation &&
             lhs.name == rhs.name &&
@@ -356,14 +356,14 @@ public final class VariableDefinition {
     public let variable: Variable
     public let type: Type
     public let defaultValue: Value?
-
+    
     init(loc: Location? = nil, variable: Variable, type: Type, defaultValue: Value? = nil) {
         self.loc = loc
         self.variable = variable
         self.type = type
         self.defaultValue = defaultValue
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "variable":
@@ -383,19 +383,19 @@ extension VariableDefinition : Equatable {
         guard lhs.variable == rhs.variable else {
             return false
         }
-
+        
         guard lhs.type == rhs.type else {
             return false
         }
-
+        
         if lhs.defaultValue == nil && rhs.defaultValue == nil {
             return true
         }
-
+        
         guard let l = lhs.defaultValue, let r = rhs.defaultValue else {
             return false
         }
-
+        
         return l == r
     }
 }
@@ -404,12 +404,12 @@ public final class Variable {
     public let kind: Kind = .variable
     public let loc: Location?
     public let name: Name
-
+    
     init(loc: Location? = nil, name: Name) {
         self.loc = loc
         self.name = name
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "name":
@@ -430,12 +430,12 @@ public final class SelectionSet {
     public let kind: Kind = .selectionSet
     public let loc: Location?
     public let selections: [Selection]
-
+    
     init(loc: Location? = nil, selections: [Selection]) {
         self.loc = loc
         self.selections = selections
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "selections":
@@ -453,18 +453,18 @@ extension SelectionSet : Hashable {
     public var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
-
+    
     public static func == (lhs: SelectionSet, rhs: SelectionSet) -> Bool {
         guard lhs.selections.count == rhs.selections.count else {
             return false
         }
-
+        
         for (l, r) in zip(lhs.selections, rhs.selections) {
             guard l == r else {
                 return false
             }
         }
-
+        
         return true
     }
 }
@@ -491,7 +491,7 @@ public func == (lhs: Selection, rhs: Selection) -> Bool {
     default:
         return false
     }
-
+    
     return false
 }
 
@@ -503,7 +503,7 @@ public final class Field {
     public let arguments: [Argument]
     public let directives: [Directive]
     public let selectionSet: SelectionSet?
-
+    
     init(loc: Location? = nil, alias: Name? = nil, name: Name, arguments: [Argument] = [], directives: [Directive] = [], selectionSet: SelectionSet? = nil) {
         self.loc = loc
         self.alias = alias
@@ -512,7 +512,7 @@ public final class Field {
         self.directives = directives
         self.selectionSet = selectionSet
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "alias":
@@ -552,13 +552,13 @@ public final class Argument {
     public let loc: Location?
     public let name: Name
     public let value: Value
-
+    
     init(loc: Location? = nil, name: Name, value: Value) {
         self.loc = loc
         self.name = name
         self.value = value
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "name":
@@ -587,13 +587,13 @@ public final class FragmentSpread {
     public let loc: Location?
     public let name: Name
     public let directives: [Directive]
-
+    
     init(loc: Location? = nil, name: Name, directives: [Directive] = []) {
         self.loc = loc
         self.name = name
         self.directives = directives
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "name":
@@ -638,7 +638,7 @@ public final class InlineFragment {
     public let typeCondition: NamedType?
     public let directives: [Directive]
     public let selectionSet: SelectionSet
-
+    
     init(loc: Location? = nil, typeCondition: NamedType? = nil, directives: [Directive] = [], selectionSet: SelectionSet) {
         self.loc = loc
         self.typeCondition = typeCondition
@@ -668,8 +668,8 @@ extension InlineFragment {
 extension InlineFragment : Equatable {
     public static func == (lhs: InlineFragment, rhs: InlineFragment) -> Bool {
         return lhs.typeCondition == rhs.typeCondition &&
-        lhs.directives == rhs.directives &&
-        lhs.selectionSet == rhs.selectionSet
+            lhs.directives == rhs.directives &&
+            lhs.selectionSet == rhs.selectionSet
     }
 }
 
@@ -680,7 +680,7 @@ public final class FragmentDefinition {
     public let typeCondition: NamedType
     public let directives: [Directive]
     public let selectionSet: SelectionSet
-
+    
     init(loc: Location? = nil, name: Name, typeCondition: NamedType, directives: [Directive] = [], selectionSet: SelectionSet) {
         self.loc = loc
         self.name = name
@@ -688,7 +688,7 @@ public final class FragmentDefinition {
         self.directives = directives
         self.selectionSet = selectionSet
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "name":
@@ -712,16 +712,16 @@ extension FragmentDefinition : Hashable {
     public var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
-
+    
     public static func == (lhs: FragmentDefinition, rhs: FragmentDefinition) -> Bool {
         return lhs.name == rhs.name &&
-        lhs.typeCondition == rhs.typeCondition &&
-        lhs.directives == rhs.directives &&
-        lhs.selectionSet == rhs.selectionSet
+            lhs.typeCondition == rhs.typeCondition &&
+            lhs.directives == rhs.directives &&
+            lhs.selectionSet == rhs.selectionSet
     }
 }
 
-public protocol Value  : Node  {}
+public protocol Value  : Node, MapFallibleRepresentable {}
 extension Variable     : Value {}
 extension IntValue     : Value {}
 extension FloatValue   : Value {}
@@ -768,7 +768,7 @@ public func == (lhs: Value, rhs: Value) -> Bool {
     default:
         return false
     }
-
+    
     return false
 }
 
@@ -776,10 +776,15 @@ public final class IntValue {
     public let kind: Kind = .intValue
     public let loc: Location?
     public let value: String
-
+    
     init(loc: Location? = nil, value: String) {
         self.loc = loc
         self.value = value
+    }
+    
+    public func asMap() throws -> Map {
+        let int = Int(value)
+        return Map(int)
     }
 }
 
@@ -793,10 +798,15 @@ public final class FloatValue {
     public let kind: Kind = .floatValue
     public let loc: Location?
     public let value: String
-
+    
     init(loc: Location? = nil, value: String) {
         self.loc = loc
         self.value = value
+    }
+    
+    public func asMap() throws -> Map {
+        let float = Double(value)
+        return Map(float)
     }
 }
 
@@ -810,10 +820,14 @@ public final class StringValue {
     public let kind: Kind = .stringValue
     public let loc: Location?
     public let value: String
-
+    
     init(loc: Location? = nil, value: String) {
         self.loc = loc
         self.value = value
+    }
+    
+    public func asMap() throws -> Map {
+        return Map.string(value)
     }
 }
 
@@ -827,10 +841,14 @@ public final class BooleanValue {
     public let kind: Kind = .booleanValue
     public let loc: Location?
     public let value: Bool
-
+    
     init(loc: Location? = nil, value: Bool) {
         self.loc = loc
         self.value = value
+    }
+    
+    public func asMap() throws -> Map {
+        return Map.bool(value)
     }
 }
 
@@ -844,7 +862,7 @@ public final class EnumValue {
     public let kind: Kind = .enumValue
     public let loc: Location?
     public let value: String
-
+    
     init(loc: Location? = nil, value: String) {
         self.loc = loc
         self.value = value
@@ -861,7 +879,7 @@ public final class ListValue {
     public let kind: Kind = .listValue
     public let loc: Location?
     public let values: [Value]
-
+    
     init(loc: Location? = nil, values: [Value]) {
         self.loc = loc
         self.values = values
@@ -873,13 +891,13 @@ extension ListValue : Equatable {
         guard lhs.values.count == rhs.values.count else {
             return false
         }
-
+        
         for (l, r) in zip(lhs.values, rhs.values) {
             guard l == r else {
                 return false
             }
         }
-
+        
         return true
     }
 }
@@ -888,10 +906,19 @@ public final class ObjectValue {
     public let kind: Kind = .objectValue
     public let loc: Location?
     public let fields: [ObjectField]
-
+    
     init(loc: Location? = nil, fields: [ObjectField]) {
         self.loc = loc
         self.fields = fields
+    }
+    
+    public func asMap() throws -> Map {
+        var dict: [String: Map] = [:]
+        for field in fields {
+            let map = try field.value.asMap()
+            dict[field.name.value] = map
+        }
+        return try dict.asMap()
     }
 }
 
@@ -906,7 +933,7 @@ public final class ObjectField {
     public let loc: Location?
     public let name: Name
     public let value: Value
-
+    
     init(loc: Location? = nil, name: Name, value: Value) {
         self.loc = loc
         self.name = name
@@ -926,7 +953,7 @@ public final class Directive {
     public let loc: Location?
     public let name: Name
     public let arguments: [Argument]
-
+    
     init(loc: Location? = nil, name: Name, arguments: [Argument] = []) {
         self.loc = loc
         self.name = name
@@ -963,7 +990,7 @@ public func == (lhs: Type, rhs: Type) -> Bool {
     default:
         return false
     }
-
+    
     return false
 }
 
@@ -971,12 +998,12 @@ public final class NamedType {
     public let kind: Kind = .namedType
     public let loc: Location?
     public let name: Name
-
+    
     init(loc: Location? = nil, name: Name) {
         self.loc = loc
         self.name = name
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "name":
@@ -997,7 +1024,7 @@ public final class ListType {
     public let kind: Kind = .listType
     public let loc: Location?
     public let type: Type
-
+    
     init(loc: Location? = nil, type: Type) {
         self.loc = loc
         self.type = type
@@ -1018,12 +1045,12 @@ public final class NonNullType {
     public let kind: Kind = .nonNullType
     public let loc: Location?
     public let type: NonNullableType
-
+    
     init(loc: Location? = nil, type: NonNullableType) {
         self.loc = loc
         self.type = type
     }
-
+    
     public func get(key: String) -> NodeResult? {
         switch key {
         case "type":
@@ -1068,7 +1095,7 @@ public func == (lhs: TypeSystemDefinition, rhs: TypeSystemDefinition) -> Bool {
     default:
         return false
     }
-
+    
     return false
 }
 
@@ -1077,7 +1104,7 @@ public final class SchemaDefinition {
     public let loc: Location?
     public let directives: [Directive]
     public let operationTypes: [OperationTypeDefinition]
-
+    
     init(loc: Location? = nil, directives: [Directive], operationTypes: [OperationTypeDefinition]) {
         self.loc = loc
         self.directives = directives
@@ -1088,7 +1115,7 @@ public final class SchemaDefinition {
 extension SchemaDefinition : Equatable {
     public static func == (lhs: SchemaDefinition, rhs: SchemaDefinition) -> Bool {
         return lhs.directives == rhs.directives &&
-        lhs.operationTypes == rhs.operationTypes
+            lhs.operationTypes == rhs.operationTypes
     }
 }
 
@@ -1097,7 +1124,7 @@ public final class OperationTypeDefinition {
     public let loc: Location?
     public let operation: OperationType
     public let type: NamedType
-
+    
     init(loc: Location? = nil, operation: OperationType, type: NamedType) {
         self.loc = loc
         self.operation = operation
@@ -1149,7 +1176,7 @@ public func == (lhs: TypeDefinition, rhs: TypeDefinition) -> Bool {
     default:
         return false
     }
-
+    
     return false
 }
 
@@ -1158,7 +1185,7 @@ public final class ScalarTypeDefinition {
     public let loc: Location?
     public let name: Name
     public let directives: [Directive]
-
+    
     init(loc: Location? = nil, name: Name, directives: [Directive] = []) {
         self.loc = loc
         self.name = name
@@ -1180,7 +1207,7 @@ public final class ObjectTypeDefinition {
     public let interfaces: [NamedType]
     public let directives: [Directive]
     public let fields: [FieldDefinition]
-
+    
     init(loc: Location? = nil, name: Name, interfaces: [NamedType] = [], directives: [Directive] = [], fields: [FieldDefinition] = []) {
         self.loc = loc
         self.name = name
@@ -1206,7 +1233,7 @@ public final class FieldDefinition {
     public let arguments: [InputValueDefinition]
     public let type: Type
     public let directives: [Directive]
-
+    
     init(loc: Location? = nil,  name: Name, arguments: [InputValueDefinition] = [], type: Type, directives: [Directive] = []) {
         self.loc = loc
         self.name = name
@@ -1232,7 +1259,7 @@ public final class InputValueDefinition {
     public let type: Type
     public let defaultValue: Value?
     public let directives: [Directive]
-
+    
     init(loc: Location? = nil, name: Name, type: Type, defaultValue: Value? = nil, directives: [Directive] = []) {
         self.loc = loc
         self.name = name
@@ -1247,19 +1274,19 @@ extension InputValueDefinition : Equatable {
         guard lhs.name == rhs.name else {
             return false
         }
-
+        
         guard lhs.type == rhs.type else {
             return false
         }
-
+        
         guard lhs.directives == rhs.directives else {
             return false
         }
-
+        
         if lhs.defaultValue == nil && rhs.defaultValue == nil {
             return true
         }
-
+        
         guard let l = lhs.defaultValue, let r = rhs.defaultValue else {
             return false
         }
@@ -1274,7 +1301,7 @@ public final class InterfaceTypeDefinition {
     public let name: Name
     public let directives: [Directive]
     public let fields: [FieldDefinition]
-
+    
     init(loc: Location? = nil, name: Name, directives: [Directive] = [], fields: [FieldDefinition]) {
         self.loc = loc
         self.name = name
@@ -1297,7 +1324,7 @@ public final class UnionTypeDefinition {
     public let name: Name
     public let directives: [Directive]
     public let types: [NamedType]
-
+    
     init(loc: Location? = nil, name: Name, directives: [Directive] = [], types: [NamedType]) {
         self.loc = loc
         self.name = name
@@ -1320,7 +1347,7 @@ public final class EnumTypeDefinition {
     public let name: Name
     public let directives: [Directive]
     public let values: [EnumValueDefinition]
-
+    
     init(loc: Location? = nil, name: Name, directives: [Directive] = [], values: [EnumValueDefinition]) {
         self.loc = loc
         self.name = name
@@ -1342,7 +1369,7 @@ public final class EnumValueDefinition {
     public let loc: Location?
     public let name: Name
     public let directives: [Directive]
-
+    
     init(loc: Location? = nil, name: Name, directives: [Directive] = []) {
         self.loc = loc
         self.name = name
@@ -1363,7 +1390,7 @@ public final class InputObjectTypeDefinition {
     public let name: Name
     public let directives: [Directive]
     public let fields: [InputValueDefinition]
-
+    
     init(loc: Location? = nil, name: Name, directives: [Directive] = [], fields: [InputValueDefinition]) {
         self.loc = loc
         self.name = name
@@ -1375,8 +1402,8 @@ public final class InputObjectTypeDefinition {
 extension InputObjectTypeDefinition : Equatable {
     public static func == (lhs: InputObjectTypeDefinition, rhs: InputObjectTypeDefinition) -> Bool {
         return lhs.name == rhs.name &&
-        lhs.directives == rhs.directives &&
-        lhs.fields == rhs.fields
+            lhs.directives == rhs.directives &&
+            lhs.fields == rhs.fields
     }
 }
 
@@ -1384,7 +1411,7 @@ public final class TypeExtensionDefinition {
     public let kind: Kind = .typeExtensionDefinition
     public let loc: Location?
     public let definition: ObjectTypeDefinition
-
+    
     init(loc: Location? = nil, definition: ObjectTypeDefinition) {
         self.loc = loc
         self.definition = definition
@@ -1415,7 +1442,7 @@ public final class DirectiveDefinition {
 extension DirectiveDefinition : Equatable {
     public static func == (lhs: DirectiveDefinition, rhs: DirectiveDefinition) -> Bool {
         return lhs.name == rhs.name &&
-        lhs.arguments == rhs.arguments &&
-        lhs.locations == rhs.locations
+            lhs.arguments == rhs.arguments &&
+            lhs.locations == rhs.locations
     }
 }
