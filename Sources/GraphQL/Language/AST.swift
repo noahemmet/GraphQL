@@ -884,6 +884,11 @@ public final class ListValue {
         self.loc = loc
         self.values = values
     }
+    
+    public func asMap() throws -> Map {
+        let array: [Map] = try values.map { try $0.asMap() }
+        return try array.asMap()
+    }
 }
 
 extension ListValue : Equatable {
