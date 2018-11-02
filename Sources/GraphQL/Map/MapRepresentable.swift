@@ -4,24 +4,24 @@ public func map(from value: Any?) throws -> Map {
     guard let value = value else {
         return .null
     }
-
+    
     if let mapRepresentable = value as? MapRepresentable {
         return mapRepresentable.map
     }
-
+    
     if let mapFallibleRepresentable = value as? MapFallibleRepresentable {
         return try mapFallibleRepresentable.asMap()
     }
     
     let info = try typeInfo(of: type(of: value))
     let props = info.properties
-
+    
     var dictionary = [String: Map](minimumCapacity: props.count)
-
+    
     for property in props {
         dictionary[property.name] = try map(from: property.get(from: value))
     }
-
+    
     return .dictionary(dictionary)
 }
 
@@ -29,11 +29,11 @@ public func assertMappable(_ type: Any.Type) throws {
     if type is MapRepresentable.Type {
         return
     }
-
+    
     if type is MapFallibleRepresentable.Type {
         return
     }
-
+    
     let info = try typeInfo(of: type)
     for property in info.properties {
         try assertMappable(property.type)
@@ -98,7 +98,7 @@ extension Array where Element : MapRepresentable {
     public var mapArray: [Map] {
         return self.map({$0.map})
     }
-
+    
     public var map: Map {
         return .array(mapArray)
     }
@@ -117,14 +117,14 @@ extension String : MapDictionaryKeyRepresentable {
 extension Dictionary where Key : MapDictionaryKeyRepresentable, Value : MapRepresentable {
     public var mapDictionary: [String: Map] {
         var dictionary: [String: Map] = [:]
-
+        
         for (key, value) in self.map({($0.0.mapDictionaryKey, $0.1.map)}) {
             dictionary[key] = value
         }
-
+        
         return dictionary
     }
-
+    
     public var map: Map {
         return .dictionary(mapDictionary)
     }
@@ -145,7 +145,7 @@ extension Array : MapFallibleRepresentable {
     public func asMap() throws -> Map {
         var array: [Map] = []
         array.reserveCapacity(count)
-
+        
         if Element.self is MapFallibleRepresentable.Type {
             for value in self {
                 let value = value as! MapFallibleRepresentable
@@ -162,8 +162,36 @@ extension Array : MapFallibleRepresentable {
                 }
             }
         }
-
+        
         return .array(array)
+    }
+}
+
+extension Map {
+    
+    public func asAny() throws -> Any {
+        switch self {
+        case .null: 
+            return Map.null
+        case .bool(let bool):
+            return bool
+        case .double(let double):
+            return double
+        case .int(let int):
+            return int
+        case .string(let string):
+            return string
+        case .array(let array):
+            return try array.map { try $0.asAny() }
+        case .dictionary(let dictionary):
+            return try dictionary.mapValues { try $0.asAny() }
+        }
+    }
+    
+    public func asAnyDictionary() throws -> [String: Any] {
+        let dictionary = try self.asDictionary(converting: true)
+        let anyDictionary: [String: Any] = try dictionary.mapValues { try $0.asAny() }
+        return anyDictionary
     }
 }
 
@@ -172,9 +200,9 @@ extension Dictionary : MapFallibleRepresentable {
         guard Key.self is MapDictionaryKeyRepresentable.Type else {
             throw MapError.notMapDictionaryKeyRepresentable(Value.self)
         }
-
+        
         var dictionary = [String: Map](minimumCapacity: count)
-
+        
         if Value.self is MapFallibleRepresentable.Type {
             for (key, value) in self {
                 let value = value as! MapFallibleRepresentable
