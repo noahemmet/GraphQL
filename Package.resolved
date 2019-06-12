@@ -6,16 +6,25 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "7f56a09995bf3c8df562be456bdcda405d9d0678",
-          "version": "3.4.1"
+          "revision": "c64f63cb21631010952f7abfef719d376ab6a441",
+          "version": "3.9.1"
+        }
+      },
+      {
+        "package": "CRuntime",
+        "repositoryURL": "https://github.com/wickwirew/CRuntime.git",
+        "state": {
+          "branch": null,
+          "revision": "95f911318d8c885f6fc05e971471f94adfd39405",
+          "version": "2.1.2"
         }
       },
       {
         "package": "Runtime",
         "repositoryURL": "https://github.com/wickwirew/Runtime.git",
         "state": {
-          "branch": "swift42",
-          "revision": "a34cd8f9a1e76e0d0c32f47abae49d6134830825",
+          "branch": "master",
+          "revision": "bc4d680429fcc02fb825bf5eb45eddfa18aa9885",
           "version": null
         }
       },
@@ -24,8 +33,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "c6acf77fc9a310c0ebf8d5f73f285d1639801d2f",
-          "version": "1.9.0"
+          "revision": "ba7970fe396e8198b84c6c1b44b38a1d4e2eb6bd",
+          "version": "1.14.1"
         }
       },
       {
